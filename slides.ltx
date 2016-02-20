@@ -1,18 +1,434 @@
 \documentclass{beamer}
-\usetheme{metropolis}           % Use metropolis theme
+\usetheme{metropolis}
+
+\usepackage[utf8]{inputenc}
+
 \title{Buenos tipos para el desarrollo web}
 \date{29 de febrero de 2016}
 \author{Alejandro Serrano}
 \institute{Haskell-MAD}
 
+%include lhs2TeX.fmt
+%include lhs2TeX.sty
+%include polycode.fmt
+
+%format :/: = ": \! \! / \! \! :"
+%format :+: = ": \! \! + \! \! :"
+%format family = "\mathbf{family}"
+%format // = "/ \! /"
+
 \begin{document}
 \maketitle
 
-\section{First Section}
+\section{¿De qué va esta charla?}
+
+\section{Una pausa para la publicidad}
 
 \begin{frame}[fragile]
-\frametitle{First Frame}
-  Hello, world!
+\frametitle{Hola, me llamo Alejandro}
+\begin{columns}
+\column{0.55\textwidth}
+\begin{itemize}
+\item Nací y he crecido en Madrid
+\item Comencé a interesarme por Haskell allá por el 2009
+\item He participado dos veces en el Google Summer of Code mejorando el soporte de Haskell para Eclipse y Emacs
+\item El año pasado publiqué un libro, \emph{Beginning Haskell}
+\end{itemize}
+\column{0.45\textwidth}
+\includegraphics[scale=0.2]{libro.jpg}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Vivo en Utrecht (Países Bajos)}
+\begin{columns}
+\column{0.45\textwidth}
+\begin{itemize}
+\item En la Universidad tienen un grupo especializado en prog. funcional
+\item Me fui de Erasmus en 2010/11 para aprender
+\item Y ahora vivo allí y me estoy doctorando :)
+\end{itemize}
+\column{0.55\textwidth}
+\includegraphics[scale=0.2]{utrecht.jpg}
+\end{columns}
+\
+
+Todos los veranos organizamos un curso de 2 semanas: \\
+\emph{\Large Applied Functional Programming} \\
+(este año es del 4 al 15 de julio)
+\end{frame}
+
+\section{Jugando con tipos (sin quemarnos)}
+
+%1
+\begin{frame}[fragile]
+\frametitle{Tipos de datos algebraicos}
+\begin{code}
+data Numero   =  Cero
+              |  Suc Numero
+
+data Arbol a  =  Hoja a
+              |  Nodo (Arbol a) a (Arbol a)
+\end{code}
+\begin{verbatim}
+*Charla> :t Suc (Suc Cero)
+Suc (Suc Cero) :: Numero
+*Charla> :t Nodo (Hoja 'a') 'b' (Hoja 'c')
+Nodo (Hoja 'a') 'b' (Hoja 'c') :: Arbol Char
+\end{verbatim}
+\end{frame}
+
+%2
+\begin{frame}[fragile]
+\frametitle{Declarando el tipo de los constructores}
+\begin{code}
+data Numero   =  Cero |  Suc Numero
+
+data Arbol a  =  Hoja a |  Nodo (Arbol a) a (Arbol a)
+\end{code}
+\begin{code}
+{-# LANGUAGE GADTs #-}
+
+data Numero where
+  Cero  ::            Numero
+  Suc   :: Numero ->  Numero
+
+data Arbol a where
+  Hoja  :: a                        -> Arbol a
+  Nodo  :: Arbol a -> a -> Arbol a  -> Arbol a
+\end{code}
+\end{frame}
+
+%3
+\begin{frame}[fragile]
+\frametitle{Describiendo campos de una tabla}
+\begin{code}
+data CampoUsuario where
+  Nombre     :: String            -> CampoUsuario
+  Apellidos  :: String            -> CampoUsuario
+  Edad       :: Integer           -> CampoUsuario
+  Direccion  :: String -> String  -> CampoUsuario
+\end{code}
+
+\pause
+¿Qué tipo le damos a la siguiente función?
+\vspace{-0.2cm}
+\begin{verbatim}
+*Charla> getCampoUsuario (Nombre "Alejandro")
+"Alejandro" :: String
+*Charla> getCampoUsuario (Edad 27)
+27          :: Integer
+\end{verbatim}
+\end{frame}
+
+%4
+\begin{frame}[fragile]
+\frametitle{ADTs generalizados (GADTs)}
+Los constructores pueden \emph{especializar} el tipo que construyen
+\begin{code}
+data CampoUsuario a where
+  Nombre     :: String            -> CampoUsuario String
+  Apellidos  :: String            -> CampoUsuario String
+  Edad       :: Integer           -> CampoUsuario Integer
+  Direccion  :: String -> String  -> CampoUsuario (String, String)
+\end{code}\vspace{0.001cm}
+
+\pause
+Ahora ya podemos tipar la función correctamente :)
+\begin{code}
+getCampoUsuario :: CampoUsuario t -> t
+\end{code}
+\end{frame}
+
+%5
+\begin{frame}[fragile]
+\frametitle{Asegurando estáticamente la validación}
+Con el ánimo alto, decidimos usar esta técnica para diferenciar cadenas HTML validadas y no validadas contra inyección de código
+\vspace{-0.7cm}
+\begin{itemize}
+\item Esta técnica se denomina \emph{tipos fantasma} (\emph{phantom types})
+\end{itemize}
+\begin{code}
+data CadenaHTML v where
+  NoV  :: String -> CadenaHTML NoValidada
+  V    :: String -> CadenaHTML Validada
+
+-- Con esto eliminamos los elementos dudosos
+escapar:: CadenaHTML NoValidada -> CadenaHTML Validada
+-- Sólo podemos mostrar cadenas escapadas
+mostrar :: CadenaHTML Validada -> HTML
+\end{code}
+\end{frame}
+
+%6
+\begin{frame}[fragile]
+\frametitle{¿De dónde sacamos los índices?}
+Una opción es definir tipos de datos vacíos
+\begin{code}
+{-# LANGUAGE EmptyDataDecls #-}
+data NoValidada
+data Validada
+\end{code}
+El problema es que sólo |NoValidada| y |Validada| tienen sentido como índices de |CadenaHTML|, pero GHC no restringe ese hecho
+\begin{verbatim}
+*Charla> :k CadenaHTML Bool
+CadenaHTML Bool :: *
+\end{verbatim}
+\end{frame}
+
+%7
+\begin{frame}[fragile]
+\frametitle{Por los cerros de ÚbeKa}
+Los \emph{kinds} son los tipos de los tipos
+\vspace{-0.2cm}
+\begin{itemize}
+\item El kind |*| es el de los tipos de valores
+\begin{verbatim}
+*Charla> :k Integer
+Integer :: *
+*Charla> :k CadenaHTML Validada
+CadenaHTML Validada :: *
+\end{verbatim}
+\item Los constructores de tipo tienen un kind con flechas
+\begin{verbatim}
+*Charla> :k Arbol
+Arbol :: * -> *
+*Charla> :k CadenaHTML
+CadenaHTML :: * -> *
+\end{verbatim}
+\end{itemize}
+
+\end{frame}
+
+%8
+\begin{frame}[fragile]
+\frametitle{Promocionando tipos}
+En GHC podemos pedir que por cada tipo de datos se genere un nuevo kind con un habitante por constructor
+\begin{code}
+{-# LANGUAGE DataKinds, KindSignatures #-}
+data EstadoValidacion = Validada | NoValidada
+
+data CadenaHTML (v :: EstadoValidacion) where ...
+\end{code}\vspace{-0.3cm}
+Es \emph{como si} pudiésemos usar valores en los índices
+
+\pause
+\begin{verbatim}
+*Charla> :k CadenaHTML Bool
+<interactive>:1:12:
+    The first argument of 'CadenaHTML'
+      should have kind 'EstadoValidacion',
+      but 'Bool' has kind '*'
+\end{verbatim}
+\end{frame}
+
+%9
+\begin{frame}[fragile]
+\frametitle{Listas indizadas por longitud}
+¿Cómo definimos este tipo de datos?
+\begin{verbatim}
+*Charla> :t 'a' :/: 'b' :/: 'c' :/: Fin
+'a' :/: 'b' :/: 'c' :/: Fin
+  :: Lista ('Suc ('Suc ('Suc 'Cero))) Char
+\end{verbatim}
+
+\pause
+Usando GADTs con un tipo promocionado de índice
+\begin{code}
+data Numero = Cero | Suc Numero
+
+infixr 8 :/:
+data Lista (n :: Numero) e where
+  Fin    ::                    Lista Cero     e
+  (:/:)  :: e -> Lista n e ->  Lista (Suc n)  e
+\end{code}
+\end{frame}
+
+%10
+\begin{frame}[fragile]
+\frametitle{Tipando algunas funciones}
+\begin{code}
+primero :: Lista (Suc n) e -> e
+-- primero Fin     = ??
+primero (e :/: _)  = e
+\end{code}
+\vspace{-0.5cm}
+\pause
+\begin{small}
+\begin{verbatim}
+*Charla> head []
+*** Exception: Prelude.head: empty list
+*Charla> primero Fin
+<interactive>:27:9:
+    Couldn't match type 'Cero with 'Suc n0
+\end{verbatim}
+\end{small}
+\pause
+\begin{code}
+unir :: Lista n e -> Lista m e -> Lista ?? e
+unir Fin        lst = lst
+unir (e :/: r)  lst = e :/: unir r lst
+\end{code}
+\end{frame}
+
+%11
+\begin{frame}[fragile]
+\frametitle{Los tipos también forman familias}
+Una \emph{familia de tipos} es una función a nivel de tipos
+\begin{code}
+type family n :+: m where
+  Cero   :+: m  = m
+  Suc n  :+: m  = Suc (n :+: m)
+\end{code}
+Ahora sí que podemos darle un tipo a |unir|
+\begin{code}
+unir :: Lista n e -> Lista m e -> Lista (n :+: m) e
+\end{code}
+\pause
+Nótese que GHC no conoce ninguna propiedad aritmética
+\begin{code}
+unir :: Lista n e -> Lista m e -> Lista (m :+: n) e
+\end{code}\vspace{-0.9cm}
+\begin{verbatim}
+Charla.hs:
+    Could not deduce (m ~ (m :+: 'Cero))
+Charla.hs:
+    Could not deduce ((m :+: 'Suc n) ~ 'Suc (m :+: n))
+\end{verbatim}
+\end{frame}
+
+%12
+\begin{frame}[fragile]
+\frametitle{Tipos asociados}
+Las familias de tipos también pueden aparecer \emph{asociadas} a clases
+\vspace{-.2cm}
+\begin{itemize}
+\item En ese caso forman una familia \emph{abierta}
+\end{itemize}
+\begin{code}
+class Coleccion c where
+  type Elemento c
+  vacio  :: c
+  (//)   :: Elemento c -> c -> c
+
+instance Coleccion [e] where
+  type Elemento [e] = e
+  vacio  = []
+  (//)   = (:)
+
+instance Coleccion IntSet where
+  type Elemento IntSet = Int
+  ...
+\end{code}
+\end{frame}
+
+%13
+\begin{frame}[fragile]
+\frametitle{En resumen}
+Haskell tiene un gran soporte para programación a nivel de tipo
+\begin{itemize}
+\item Los \emph{kinds} son los tipos de los tipos
+\item Podemos crear nuevos kinds por \emph{promoción}
+\item Y definir funciones sobre tipos usando \emph{familias}
+\item Los \emph{GADTs} nos permiten refinar el tipo de los constructores
+\end{itemize}
+Tipos más concretos = más errores capturados al compilar
+\end{frame}
+
+%14
+\begin{frame}[fragile]
+\frametitle{¿Qué no puedo hacer en Haskell?}
+Los valores pasados a una función \emph{no pueden influenciar} su tipo
+\begin{itemize}
+\item No puedo escribir una función que dado un número |n| y un valor |v|, devuelva una |Lista n e| repitiendo en valor |v|
+\item Existen dos mundos separados: valores y tipos/kinds/\dots
+\item De ahí que sea necesaria la promoción
+\end{itemize}
+\end{frame}
+
+%15
+\begin{frame}[fragile]
+\frametitle{Tipos dependientes}
+Los sistemas de \emph{tipos dependientes} eliminan esa barrera\vspace{-0.2cm}
+\begin{itemize}
+\item Algunos lenguajes que los soportan son {\bf Idris}, Agda y Coq
+\item Ojo, son lenguajes experimentales
+\end{itemize}
+Además, se pueden usar para \emph{probar} propiedades de los programas\vspace{-0.2cm}
+\begin{itemize}
+\item Por ejemplo, |invertir (invertir lst) = lst|
+\end{itemize}
+\begin{code}
+repetir : (n : Numero) -> e -> Lista n e
+repetir Cero     x = Fin
+repetir (Suc n)  x = x :/: repetir n x
+\end{code}
+\end{frame}
+
+%16
+\begin{frame}[fragile]
+\frametitle{Estoy en ascuas, quiero saber más}
+Vídeos (los podéis encontrar en YouTube)
+\begin{itemize}
+\item \emph{Depending on Types} de Stephanie Weirich
+\begin{itemize}
+\item \emph{Keynote} de ICFP 2014
+\end{itemize}
+\item \emph{A practical intro to Haskell GADTs} de Richard Eisenberg
+\begin{itemize}
+\item Parte de LambdaConf (este año en mayo)
+\end{itemize}
+\item \emph{Adventures with Types} de Simon Peyton Jones
+\begin{itemize}
+\item Un conjunto de charlas sobre el sistema de tipos de Haskell
+\end{itemize}
+\end{itemize}
+
+Libros (perfectos para leer en el tren)
+\begin{itemize}
+\item \emph{Beginning Haskell}, por supuesto :P
+\item \emph{Type-Driven Development with Idris} de Edwin Brady
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A}
+
 \end{frame}
 
 \end{document}
