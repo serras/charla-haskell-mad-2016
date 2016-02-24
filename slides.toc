@@ -1,0 +1,11 @@
+\beamer@endinputifotherversion {3.36pt}
+\beamer@sectionintoc {1}{\IeC {\textquestiondown }De qu\IeC {\'e} va esta charla?}{2}{0}{1}
+\beamer@sectionintoc {2}{Una pausa para la publicidad}{3}{0}{2}
+\beamer@sectionintoc {3}{Jugando con tipos (sin quemarnos)}{6}{0}{3}
+\beamer@sectionintoc {4}{\IeC {\textexclamdown }Desarrollo web!}{30}{0}{4}
+\beamer@sectionintoc {5}{Un poco de relax con JSON}{31}{0}{5}
+\beamer@sectionintoc {6}{Hora de un merecido descanso}{38}{0}{6}
+\beamer@sectionintoc {7}{Sirviendo con Servant}{39}{0}{7}
+\beamer@sectionintoc {8}{Bases de datos}{59}{0}{8}
+\beamer@sectionintoc {9}{Vamos a ir acabando\dots }{68}{0}{9}
+\beamer@sectionintoc {10}{\IeC {\textexclamdown }Mil gracias!}{71}{0}{10}

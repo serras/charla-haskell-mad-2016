@@ -1,0 +1,717 @@
+[1 of 1] Compiling CharlaServant    ( CharlaServant.hs, CharlaServant.o )
+CharlaServant.hs:(29,23)-(40,2): Splicing expression
+    "\n\
+    \Usuario json\n\
+    \  nombre    String\n\
+    \  apellidos String\n\
+    \  NombreCompleto nombre apellidos\n\
+    \  deriving Show\n\
+    \Contador json\n\
+    \  nombre  String\n\
+    \  valor   Int\n\
+    \  usuario UsuarioId\n\
+    \  deriving Show\n"
+  ======>
+    [(EntityDef
+        (HaskellName (packPTH "Usuario"))
+        (DBName (packPTH "usuario"))
+        (FieldDef
+           (HaskellName (packPTH "Id"))
+           (DBName (packPTH "id"))
+           (FTTypeCon Nothing (packPTH "UsuarioId"))
+           SqlInt64
+           []
+           True
+           (ForeignRef
+              (HaskellName (packPTH "Usuario"))
+              (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64"))))
+        [packPTH "json"]
+        [FieldDef
+           (HaskellName (packPTH "nombre"))
+           (DBName (packPTH "nombre"))
+           (FTTypeCon Nothing (packPTH "String"))
+           (SqlOther (packPTH "SqlType unset for nombre"))
+           []
+           True
+           NoReference,
+         FieldDef
+           (HaskellName (packPTH "apellidos"))
+           (DBName (packPTH "apellidos"))
+           (FTTypeCon Nothing (packPTH "String"))
+           (SqlOther (packPTH "SqlType unset for apellidos"))
+           []
+           True
+           NoReference]
+        [UniqueDef
+           (HaskellName (packPTH "NombreCompleto"))
+           (DBName (packPTH "nombre_completo"))
+           [(HaskellName (packPTH "nombre"), DBName (packPTH "nombre")),
+            (HaskellName (packPTH "apellidos"), DBName (packPTH "apellidos"))]
+           []]
+        []
+        [packPTH "Show"]
+        (containers-0.5.6.2:Data.Map.Base.fromList [])
+        False)
+       {entityFields = [FieldDef
+                          (HaskellName (packPTH "nombre"))
+                          (DBName (packPTH "nombre"))
+                          (FTTypeCon Nothing (packPTH "String"))
+                          (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                             (Proxy :: Proxy String))
+                          []
+                          True
+                          NoReference,
+                        FieldDef
+                          (HaskellName (packPTH "apellidos"))
+                          (DBName (packPTH "apellidos"))
+                          (FTTypeCon Nothing (packPTH "String"))
+                          (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                             (Proxy :: Proxy String))
+                          []
+                          True
+                          NoReference],
+        entityId = FieldDef
+                     (HaskellName (packPTH "Id"))
+                     (DBName (packPTH "id"))
+                     (FTTypeCon Nothing (packPTH "UsuarioId"))
+                     (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                        (Proxy :: Proxy GHC.Int.Int64))
+                     []
+                     True
+                     (ForeignRef
+                        (HaskellName (packPTH "Usuario"))
+                        (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))},
+     (EntityDef
+        (HaskellName (packPTH "Contador"))
+        (DBName (packPTH "contador"))
+        (FieldDef
+           (HaskellName (packPTH "Id"))
+           (DBName (packPTH "id"))
+           (FTTypeCon Nothing (packPTH "ContadorId"))
+           SqlInt64
+           []
+           True
+           (ForeignRef
+              (HaskellName (packPTH "Contador"))
+              (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64"))))
+        [packPTH "json"]
+        [FieldDef
+           (HaskellName (packPTH "nombre"))
+           (DBName (packPTH "nombre"))
+           (FTTypeCon Nothing (packPTH "String"))
+           (SqlOther (packPTH "SqlType unset for nombre"))
+           []
+           True
+           NoReference,
+         FieldDef
+           (HaskellName (packPTH "valor"))
+           (DBName (packPTH "valor"))
+           (FTTypeCon Nothing (packPTH "Int"))
+           (SqlOther (packPTH "SqlType unset for valor"))
+           []
+           True
+           NoReference,
+         FieldDef
+           (HaskellName (packPTH "usuario"))
+           (DBName (packPTH "usuario"))
+           (FTTypeCon Nothing (packPTH "UsuarioId"))
+           (SqlOther (packPTH "SqlType unset for usuario"))
+           []
+           True
+           (ForeignRef
+              (HaskellName (packPTH "Usuario"))
+              (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))]
+        []
+        []
+        [packPTH "Show"]
+        (containers-0.5.6.2:Data.Map.Base.fromList [])
+        False)
+       {entityFields = [FieldDef
+                          (HaskellName (packPTH "nombre"))
+                          (DBName (packPTH "nombre"))
+                          (FTTypeCon Nothing (packPTH "String"))
+                          (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                             (Proxy :: Proxy String))
+                          []
+                          True
+                          NoReference,
+                        FieldDef
+                          (HaskellName (packPTH "valor"))
+                          (DBName (packPTH "valor"))
+                          (FTTypeCon Nothing (packPTH "Int"))
+                          (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                             (Proxy :: Proxy Int))
+                          []
+                          True
+                          NoReference,
+                        FieldDef
+                          (HaskellName (packPTH "usuario"))
+                          (DBName (packPTH "usuario"))
+                          (FTTypeCon Nothing (packPTH "UsuarioId"))
+                          (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                             (Proxy :: Proxy GHC.Int.Int64))
+                          []
+                          True
+                          (ForeignRef
+                             (HaskellName (packPTH "Usuario"))
+                             (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))],
+        entityId = FieldDef
+                     (HaskellName (packPTH "Id"))
+                     (DBName (packPTH "id"))
+                     (FTTypeCon Nothing (packPTH "ContadorId"))
+                     (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                        (Proxy :: Proxy GHC.Int.Int64))
+                     []
+                     True
+                     (ForeignRef
+                        (HaskellName (packPTH "Contador"))
+                        (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))}]
+CharlaServant.hs:(29,1)-(40,2): Splicing declarations
+    mkPersist
+      sqlSettings
+      ([(EntityDef
+           (HaskellName (packPTH "Usuario"))
+           (DBName (packPTH "usuario"))
+           (FieldDef
+              (HaskellName (packPTH "Id"))
+              (DBName (packPTH "id"))
+              (FTTypeCon Nothing (packPTH "UsuarioId"))
+              SqlInt64
+              []
+              True
+              (ForeignRef
+                 (HaskellName (packPTH "Usuario"))
+                 (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64"))))
+           [packPTH "json"]
+           [FieldDef
+              (HaskellName (packPTH "nombre"))
+              (DBName (packPTH "nombre"))
+              (FTTypeCon Nothing (packPTH "String"))
+              (SqlOther (packPTH "SqlType unset for nombre"))
+              []
+              True
+              NoReference,
+            FieldDef
+              (HaskellName (packPTH "apellidos"))
+              (DBName (packPTH "apellidos"))
+              (FTTypeCon Nothing (packPTH "String"))
+              (SqlOther (packPTH "SqlType unset for apellidos"))
+              []
+              True
+              NoReference]
+           [UniqueDef
+              (HaskellName (packPTH "NombreCompleto"))
+              (DBName (packPTH "nombre_completo"))
+              [(HaskellName (packPTH "nombre"), DBName (packPTH "nombre")),
+               (HaskellName (packPTH "apellidos"), DBName (packPTH "apellidos"))]
+              []]
+           []
+           [packPTH "Show"]
+           (containers-0.5.6.2:Data.Map.Base.fromList [])
+           False)
+          {entityFields = [FieldDef
+                             (HaskellName (packPTH "nombre"))
+                             (DBName (packPTH "nombre"))
+                             (FTTypeCon Nothing (packPTH "String"))
+                             (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                                (Proxy :: Proxy String))
+                             []
+                             True
+                             NoReference,
+                           FieldDef
+                             (HaskellName (packPTH "apellidos"))
+                             (DBName (packPTH "apellidos"))
+                             (FTTypeCon Nothing (packPTH "String"))
+                             (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                                (Proxy :: Proxy String))
+                             []
+                             True
+                             NoReference],
+           entityId = FieldDef
+                        (HaskellName (packPTH "Id"))
+                        (DBName (packPTH "id"))
+                        (FTTypeCon Nothing (packPTH "UsuarioId"))
+                        (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                           (Proxy :: Proxy GHC.Int.Int64))
+                        []
+                        True
+                        (ForeignRef
+                           (HaskellName (packPTH "Usuario"))
+                           (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))},
+        (EntityDef
+           (HaskellName (packPTH "Contador"))
+           (DBName (packPTH "contador"))
+           (FieldDef
+              (HaskellName (packPTH "Id"))
+              (DBName (packPTH "id"))
+              (FTTypeCon Nothing (packPTH "ContadorId"))
+              SqlInt64
+              []
+              True
+              (ForeignRef
+                 (HaskellName (packPTH "Contador"))
+                 (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64"))))
+           [packPTH "json"]
+           [FieldDef
+              (HaskellName (packPTH "nombre"))
+              (DBName (packPTH "nombre"))
+              (FTTypeCon Nothing (packPTH "String"))
+              (SqlOther (packPTH "SqlType unset for nombre"))
+              []
+              True
+              NoReference,
+            FieldDef
+              (HaskellName (packPTH "valor"))
+              (DBName (packPTH "valor"))
+              (FTTypeCon Nothing (packPTH "Int"))
+              (SqlOther (packPTH "SqlType unset for valor"))
+              []
+              True
+              NoReference,
+            FieldDef
+              (HaskellName (packPTH "usuario"))
+              (DBName (packPTH "usuario"))
+              (FTTypeCon Nothing (packPTH "UsuarioId"))
+              (SqlOther (packPTH "SqlType unset for usuario"))
+              []
+              True
+              (ForeignRef
+                 (HaskellName (packPTH "Usuario"))
+                 (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))]
+           []
+           []
+           [packPTH "Show"]
+           (containers-0.5.6.2:Data.Map.Base.fromList [])
+           False)
+          {entityFields = [FieldDef
+                             (HaskellName (packPTH "nombre"))
+                             (DBName (packPTH "nombre"))
+                             (FTTypeCon Nothing (packPTH "String"))
+                             (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                                (Proxy :: Proxy String))
+                             []
+                             True
+                             NoReference,
+                           FieldDef
+                             (HaskellName (packPTH "valor"))
+                             (DBName (packPTH "valor"))
+                             (FTTypeCon Nothing (packPTH "Int"))
+                             (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                                (Proxy :: Proxy Int))
+                             []
+                             True
+                             NoReference,
+                           FieldDef
+                             (HaskellName (packPTH "usuario"))
+                             (DBName (packPTH "usuario"))
+                             (FTTypeCon Nothing (packPTH "UsuarioId"))
+                             (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                                (Proxy :: Proxy GHC.Int.Int64))
+                             []
+                             True
+                             (ForeignRef
+                                (HaskellName (packPTH "Usuario"))
+                                (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))],
+           entityId = FieldDef
+                        (HaskellName (packPTH "Id"))
+                        (DBName (packPTH "id"))
+                        (FTTypeCon Nothing (packPTH "ContadorId"))
+                        (persistent-2.2.4:Database.Persist.Sql.Class.sqlType
+                           (Proxy :: Proxy GHC.Int.Int64))
+                        []
+                        True
+                        (ForeignRef
+                           (HaskellName (packPTH "Contador"))
+                           (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))}])
+  ======>
+    instance PersistField Usuario where
+      toPersistValue
+        = \ ent_afqs
+            -> (PersistMap
+                $ (Prelude.zip
+                     (Prelude.map pack ["nombre", "apellidos"])
+                     ((Prelude.map toPersistValue) $ (toPersistFields ent_afqs))))
+      fromPersistValue
+        = ((\ x_afqt
+              -> let columns_afqu = Data.HashMap.Strict.fromList x_afqt
+                 in
+                   (fromPersistValues
+                    $ ((Prelude.map
+                          (\ name_afqv
+                             -> case
+                                    unordered-containers-0.2.5.1:Data.HashMap.Base.lookup
+                                      (pack name_afqv) columns_afqu
+                                of {
+                                  Just v_afqw -> v_afqw
+                                  Nothing -> PersistNull }))
+                       $ ["nombre", "apellidos"])))
+           <=< getPersistMap)
+    instance persistent-2.2.4:Database.Persist.Sql.Class.PersistFieldSql Usuario where
+      persistent-2.2.4:Database.Persist.Sql.Class.sqlType _ = SqlString
+    instance PersistField Contador where
+      toPersistValue
+        = \ ent_afqx
+            -> (PersistMap
+                $ (Prelude.zip
+                     (Prelude.map pack ["nombre", "valor", "usuario"])
+                     ((Prelude.map toPersistValue) $ (toPersistFields ent_afqx))))
+      fromPersistValue
+        = ((\ x_afqy
+              -> let columns_afqz = Data.HashMap.Strict.fromList x_afqy
+                 in
+                   (fromPersistValues
+                    $ ((Prelude.map
+                          (\ name_afqA
+                             -> case
+                                    unordered-containers-0.2.5.1:Data.HashMap.Base.lookup
+                                      (pack name_afqA) columns_afqz
+                                of {
+                                  Just v_afqB -> v_afqB
+                                  Nothing -> PersistNull }))
+                       $ ["nombre", "valor", "usuario"])))
+           <=< getPersistMap)
+    instance persistent-2.2.4:Database.Persist.Sql.Class.PersistFieldSql Contador where
+      persistent-2.2.4:Database.Persist.Sql.Class.sqlType _ = SqlString
+    data Usuario
+      = Usuario {usuarioNombre :: !String, usuarioApellidos :: !String}
+      deriving (Show)
+    type UsuarioId = Key Usuario
+    instance PersistEntity Usuario where
+      type PersistEntityBackend Usuario = persistent-2.2.4:Database.Persist.Sql.Types.SqlBackend
+      data Unique Usuario = NombreCompleto String String
+      newtype Key Usuario
+        = UsuarioKey {unUsuarioKey :: BackendKey persistent-2.2.4:Database.Persist.Sql.Types.SqlBackend}
+        deriving (Show,
+                  Read,
+                  Eq,
+                  Ord,
+                  Web.PathPieces.PathPiece,
+                  Web.HttpApiData.Internal.ToHttpApiData,
+                  Web.HttpApiData.Internal.FromHttpApiData,
+                  PersistField,
+                  persistent-2.2.4:Database.Persist.Sql.Class.PersistFieldSql,
+                  ToJSON,
+                  FromJSON)
+      data EntityField Usuario typ
+        = typ ~ Key Usuario => UsuarioId |
+          typ ~ String => UsuarioNombre |
+          typ ~ String => UsuarioApellidos
+      keyToValues = ((GHC.Types.: []) . (toPersistValue . unUsuarioKey))
+      keyFromValues
+        = ((fmap UsuarioKey)
+           . (fromPersistValue . Database.Persist.TH.headNote))
+      entityDef _
+        = EntityDef
+            (HaskellName (packPTH "Usuario"))
+            (DBName (packPTH "usuario"))
+            (FieldDef
+               (HaskellName (packPTH "Id"))
+               (DBName (packPTH "id"))
+               (FTTypeCon Nothing (packPTH "UsuarioId"))
+               SqlInt64
+               []
+               True
+               (ForeignRef
+                  (HaskellName (packPTH "Usuario"))
+                  (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64"))))
+            [packPTH "json"]
+            [FieldDef
+               (HaskellName (packPTH "nombre"))
+               (DBName (packPTH "nombre"))
+               (FTTypeCon Nothing (packPTH "String"))
+               SqlString
+               []
+               True
+               NoReference,
+             FieldDef
+               (HaskellName (packPTH "apellidos"))
+               (DBName (packPTH "apellidos"))
+               (FTTypeCon Nothing (packPTH "String"))
+               SqlString
+               []
+               True
+               NoReference]
+            [UniqueDef
+               (HaskellName (packPTH "NombreCompleto"))
+               (DBName (packPTH "nombre_completo"))
+               [(HaskellName (packPTH "nombre"), DBName (packPTH "nombre")),
+                (HaskellName (packPTH "apellidos"), DBName (packPTH "apellidos"))]
+               []]
+            []
+            [packPTH "Show"]
+            (containers-0.5.6.2:Data.Map.Base.fromList [])
+            False
+      toPersistFields (Usuario x_afqC x_afqD)
+        = [SomePersistField x_afqC, SomePersistField x_afqD]
+      fromPersistValues [x1_afqF, x2_afqG]
+        = Usuario
+          <$>
+            ((Database.Persist.TH.mapLeft
+                (Database.Persist.TH.fieldError (packPTH "nombre")))
+             . fromPersistValue)
+              x1_afqF
+          <*>
+            ((Database.Persist.TH.mapLeft
+                (Database.Persist.TH.fieldError (packPTH "apellidos")))
+             . fromPersistValue)
+              x2_afqG
+      fromPersistValues x_afqE
+        = (Left
+           $ (mappend
+                (packPTH "Usuario: fromPersistValues failed on: ")
+                (pack $ (show x_afqE))))
+      persistUniqueToFieldNames (NombreCompleto {})
+        = [(HaskellName (packPTH "nombre"), DBName (packPTH "nombre")),
+           (HaskellName (packPTH "apellidos"), DBName (packPTH "apellidos"))]
+      persistUniqueToValues (NombreCompleto x_afqH x_afqI)
+        = [toPersistValue x_afqH, toPersistValue x_afqI]
+      persistUniqueKeys (Usuario _nombre_afqJ _apellidos_afqK)
+        = [NombreCompleto _nombre_afqJ _apellidos_afqK]
+      persistFieldDef UsuarioId
+        = FieldDef
+            (HaskellName (packPTH "Id"))
+            (DBName (packPTH "id"))
+            (FTTypeCon Nothing (packPTH "UsuarioId"))
+            SqlInt64
+            []
+            True
+            (ForeignRef
+               (HaskellName (packPTH "Usuario"))
+               (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))
+      persistFieldDef UsuarioNombre
+        = FieldDef
+            (HaskellName (packPTH "nombre"))
+            (DBName (packPTH "nombre"))
+            (FTTypeCon Nothing (packPTH "String"))
+            SqlString
+            []
+            True
+            NoReference
+      persistFieldDef UsuarioApellidos
+        = FieldDef
+            (HaskellName (packPTH "apellidos"))
+            (DBName (packPTH "apellidos"))
+            (FTTypeCon Nothing (packPTH "String"))
+            SqlString
+            []
+            True
+            NoReference
+      persistIdField = UsuarioId
+      fieldLens UsuarioId
+        = lensPTH
+            entityKey
+            (\ (Entity _ value_afqL) key_afqM -> Entity key_afqM value_afqL)
+      fieldLens UsuarioNombre
+        = lensPTH
+            (usuarioNombre . entityVal)
+            (\ (Entity key_afqN value_afqO) x_afqP
+               -> Entity key_afqN (value_afqO {usuarioNombre = x_afqP}))
+      fieldLens UsuarioApellidos
+        = lensPTH
+            (usuarioApellidos . entityVal)
+            (\ (Entity key_afqN value_afqO) x_afqP
+               -> Entity key_afqN (value_afqO {usuarioApellidos = x_afqP}))
+    instance ToBackendKey persistent-2.2.4:Database.Persist.Sql.Types.SqlBackend Usuario where
+      toBackendKey = unUsuarioKey
+      fromBackendKey = UsuarioKey
+    data Contador
+      = Contador {contadorNombre :: !String,
+                  contadorValor :: !Int,
+                  contadorUsuario :: !(Key Usuario)}
+      deriving (Show)
+    type ContadorId = Key Contador
+    instance PersistEntity Contador where
+      type PersistEntityBackend Contador = persistent-2.2.4:Database.Persist.Sql.Types.SqlBackend
+      data Unique Contador
+      newtype Key Contador
+        = ContadorKey {unContadorKey :: BackendKey persistent-2.2.4:Database.Persist.Sql.Types.SqlBackend}
+        deriving (Show,
+                  Read,
+                  Eq,
+                  Ord,
+                  Web.PathPieces.PathPiece,
+                  Web.HttpApiData.Internal.ToHttpApiData,
+                  Web.HttpApiData.Internal.FromHttpApiData,
+                  PersistField,
+                  persistent-2.2.4:Database.Persist.Sql.Class.PersistFieldSql,
+                  ToJSON,
+                  FromJSON)
+      data EntityField Contador typ
+        = typ ~ Key Contador => ContadorId |
+          typ ~ String => ContadorNombre |
+          typ ~ Int => ContadorValor |
+          typ ~ Key Usuario => ContadorUsuario
+      keyToValues = ((GHC.Types.: []) . (toPersistValue . unContadorKey))
+      keyFromValues
+        = ((fmap ContadorKey)
+           . (fromPersistValue . Database.Persist.TH.headNote))
+      entityDef _
+        = EntityDef
+            (HaskellName (packPTH "Contador"))
+            (DBName (packPTH "contador"))
+            (FieldDef
+               (HaskellName (packPTH "Id"))
+               (DBName (packPTH "id"))
+               (FTTypeCon Nothing (packPTH "ContadorId"))
+               SqlInt64
+               []
+               True
+               (ForeignRef
+                  (HaskellName (packPTH "Contador"))
+                  (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64"))))
+            [packPTH "json"]
+            [FieldDef
+               (HaskellName (packPTH "nombre"))
+               (DBName (packPTH "nombre"))
+               (FTTypeCon Nothing (packPTH "String"))
+               SqlString
+               []
+               True
+               NoReference,
+             FieldDef
+               (HaskellName (packPTH "valor"))
+               (DBName (packPTH "valor"))
+               (FTTypeCon Nothing (packPTH "Int"))
+               SqlInt64
+               []
+               True
+               NoReference,
+             FieldDef
+               (HaskellName (packPTH "usuario"))
+               (DBName (packPTH "usuario"))
+               (FTTypeCon Nothing (packPTH "UsuarioId"))
+               SqlInt64
+               []
+               True
+               (ForeignRef
+                  (HaskellName (packPTH "Usuario"))
+                  (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))]
+            []
+            []
+            [packPTH "Show"]
+            (containers-0.5.6.2:Data.Map.Base.fromList [])
+            False
+      toPersistFields (Contador x_afqQ x_afqR x_afqS)
+        = [SomePersistField x_afqQ, SomePersistField x_afqR,
+           SomePersistField x_afqS]
+      fromPersistValues [x1_afqU, x2_afqV, x3_afqW]
+        = Contador
+          <$>
+            ((Database.Persist.TH.mapLeft
+                (Database.Persist.TH.fieldError (packPTH "nombre")))
+             . fromPersistValue)
+              x1_afqU
+          <*>
+            ((Database.Persist.TH.mapLeft
+                (Database.Persist.TH.fieldError (packPTH "valor")))
+             . fromPersistValue)
+              x2_afqV
+          <*>
+            ((Database.Persist.TH.mapLeft
+                (Database.Persist.TH.fieldError (packPTH "usuario")))
+             . fromPersistValue)
+              x3_afqW
+      fromPersistValues x_afqT
+        = (Left
+           $ (mappend
+                (packPTH "Contador: fromPersistValues failed on: ")
+                (pack $ (show x_afqT))))
+      persistUniqueToFieldNames _
+        = error "Degenerate case, should never happen"
+      persistUniqueToValues _
+        = error "Degenerate case, should never happen"
+      persistUniqueKeys (Contador _nombre_afqX _valor_afqY _usuario_afqZ)
+        = []
+      persistFieldDef ContadorId
+        = FieldDef
+            (HaskellName (packPTH "Id"))
+            (DBName (packPTH "id"))
+            (FTTypeCon Nothing (packPTH "ContadorId"))
+            SqlInt64
+            []
+            True
+            (ForeignRef
+               (HaskellName (packPTH "Contador"))
+               (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))
+      persistFieldDef ContadorNombre
+        = FieldDef
+            (HaskellName (packPTH "nombre"))
+            (DBName (packPTH "nombre"))
+            (FTTypeCon Nothing (packPTH "String"))
+            SqlString
+            []
+            True
+            NoReference
+      persistFieldDef ContadorValor
+        = FieldDef
+            (HaskellName (packPTH "valor"))
+            (DBName (packPTH "valor"))
+            (FTTypeCon Nothing (packPTH "Int"))
+            SqlInt64
+            []
+            True
+            NoReference
+      persistFieldDef ContadorUsuario
+        = FieldDef
+            (HaskellName (packPTH "usuario"))
+            (DBName (packPTH "usuario"))
+            (FTTypeCon Nothing (packPTH "UsuarioId"))
+            SqlInt64
+            []
+            True
+            (ForeignRef
+               (HaskellName (packPTH "Usuario"))
+               (FTTypeCon (Just (packPTH "Data.Int")) (packPTH "Int64")))
+      persistIdField = ContadorId
+      fieldLens ContadorId
+        = lensPTH
+            entityKey
+            (\ (Entity _ value_afr0) key_afr1 -> Entity key_afr1 value_afr0)
+      fieldLens ContadorNombre
+        = lensPTH
+            (contadorNombre . entityVal)
+            (\ (Entity key_afr2 value_afr3) x_afr4
+               -> Entity key_afr2 (value_afr3 {contadorNombre = x_afr4}))
+      fieldLens ContadorValor
+        = lensPTH
+            (contadorValor . entityVal)
+            (\ (Entity key_afr2 value_afr3) x_afr4
+               -> Entity key_afr2 (value_afr3 {contadorValor = x_afr4}))
+      fieldLens ContadorUsuario
+        = lensPTH
+            (contadorUsuario . entityVal)
+            (\ (Entity key_afr2 value_afr3) x_afr4
+               -> Entity key_afr2 (value_afr3 {contadorUsuario = x_afr4}))
+    instance ToBackendKey persistent-2.2.4:Database.Persist.Sql.Types.SqlBackend Contador where
+      toBackendKey = unContadorKey
+      fromBackendKey = ContadorKey
+    instance ToJSON Usuario where
+      toJSON (Usuario nombre_afr6 apellidos_afr7)
+        = object
+            [((pack "nombre") .= nombre_afr6),
+             ((pack "apellidos") .= apellidos_afr7)]
+    instance FromJSON Usuario where
+      parseJSON (Object obj_afr5)
+        = (((pure Usuario) <*> (obj_afr5 .: (pack "nombre")))
+           <*> (obj_afr5 .: (pack "apellidos")))
+      parseJSON _ = mzero
+    instance ToJSON (Entity Usuario) where
+      toJSON = entityIdToJSON
+    instance FromJSON (Entity Usuario) where
+      parseJSON = entityIdFromJSON
+    instance ToJSON Contador where
+      toJSON (Contador nombre_afr9 valor_afra usuario_afrb)
+        = object
+            [((pack "nombre") .= nombre_afr9), ((pack "valor") .= valor_afra),
+             ((pack "usuario") .= usuario_afrb)]
+    instance FromJSON Contador where
+      parseJSON (Object obj_afr8)
+        = ((((pure Contador) <*> (obj_afr8 .: (pack "nombre")))
+            <*> (obj_afr8 .: (pack "valor")))
+           <*> (obj_afr8 .: (pack "usuario")))
+      parseJSON _ = mzero
+    instance ToJSON (Entity Contador) where
+      toJSON = entityIdToJSON
+    instance FromJSON (Entity Contador) where
+      parseJSON = entityIdFromJSON
+Linking servidor ...

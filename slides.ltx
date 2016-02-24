@@ -2,6 +2,7 @@
 \usetheme{metropolis}
 
 \usepackage[utf8]{inputenc}
+\usepackage{epiolmec}
 
 \title{Buenos tipos para el desarrollo web}
 \date{29 de febrero de 2016}
@@ -16,6 +17,11 @@
 %format :+: = ": \! \! + \! \! :"
 %format family = "\mathbf{family}"
 %format // = "/ \! /"
+%format :<|> = ": \! \! \langle | \rangle"
+%format :> = ": \! >"
+%format <$> = "~\langle \! \$ \! \rangle~"
+%format <*> = "~\langle \! * \! \rangle~"
+%format flu = "` \!"
 
 \begin{document}
 \maketitle
@@ -391,44 +397,609 @@ Libros (perfectos para leer en el tren)
 \end{itemize}
 \end{frame}
 
+\section{¡Desarrollo web!}
+
+\section{Un poco de relax con JSON}
+
+%17
 \begin{frame}[fragile]
-\frametitle{A}
+\frametitle{JSON está por todas partes}
+En estos tiempos modernos, no hay aplicación web que se precie que no consuma y genere JSON (aunque sea un poquito)
+\begin{itemize}
+\item JSON = Javascript Object Notation
+\begin{verbatim}
+{
+  "nombre"    : "Alejandro",
+  "apellidos" : "Serrano Mena"
+  "edad"      : 27
+}
+\end{verbatim}
+\item Trabajar con JSON es tedioso y propenso a errores tontos
+\end{itemize}
+\pause
+Esta parte va sobre cómo \emph{no} escribir código que trate JSON
+\begin{itemize}
+\item Las mejores líneas de código son las que no escribes ;)
+\end{itemize}
+\end{frame}
+
+%18
+\begin{frame}[fragile]
+\frametitle{Esón, padre de Jasón}
+{\tt aeson} es el estándar de facto para trabajar con JSON en Haskell
+\begin{verbatim}
+{
+  "nombre"    : "Alejandro",
+  "apellidos" : "Serrano Mena"
+  "edad"      : 27
+}
+\end{verbatim}
+\begin{code}
+{-# LANGUAGE OverloadedStrings #-}
+object  [ "nombre"     .= String "Alejandro"
+        , "apellidos"  .= String "Serrano Mena"
+        , "edad"       .= Number 27 ]
+\end{code}
+\end{frame}
+
+%19
+%\begin{frame}[fragile]
+%\frametitle{Representando JSON}
+%{\tt aeson} utiliza un tipo de dato muy simple que representa todas las posibilidades del lenguaje JSON
+%\begin{itemize}
+%\item Tan pequeño que cabe en una diapositiva
+%\end{itemize}
+%\begin{code}
+%data Value   =  Object  Object
+%             |  Array   Array
+%             |  String  Text
+%                        -- Un String más eficiente
+%             |  Number  Scientific
+%                        -- Un número de precisión arbitraria
+%             |  Bool    Bool
+%             |  Null
+%type Array   =  Vector Value
+%type Object  =  HashMap Text Value
+%\end{code}
+%\end{frame}
+
+%19
+\begin{frame}[fragile]
+\frametitle{De tu tipo a JSON y viceversa}
+Es preferible, no obstante, trabajar con tus propios tipos de datos
+\begin{itemize}
+\item Si trabajamos con |Value| directamente, perdemos las ventajas de un tipado fuerte
+\item En la frontera de nuestra aplicación con el mundo exterior, no queda más remedio que convertir de y a JSON
+\end{itemize}
+\begin{code}
+class ToJSON where
+  toJSON     :: a -> Value
+
+class FromJSON where
+  parseJSON  :: Value -> Parser a
+             -- Parser es como un Maybe más informativo
+\end{code}
+\end{frame}
+
+%20
+\begin{frame}[fragile]
+\frametitle{Tedio, aburrimiento, sopor}
+\begin{code}
+data Persona  = Persona  { nombre      :: String
+                         , apellidos   :: String
+                         , edad        :: Integer }
+              deriving (Eq, Show)
+
+instance ToJSON Persona where
+  toJSON (Persona n a e) = object  [ "nombre"     .= n
+                                   , "apellidos"  .= a
+                                   , "edad"       .= e ]
+instance FromJSON Persona where
+  parseJSON v = ...
+\end{code}
+¡Y esto por cada tipo de datos en tu aplicación!
+\end{frame}
+
+%21
+\begin{frame}[fragile]
+\frametitle{Derivación genérica al rescate}
+\begin{code}
+{-# LANGUAGE DeriveGeneric #-}
+import Data.Aeson
+import GHC.Generics
+
+data Persona  = Persona { ... }
+              deriving (Eq, Show, Generic)
+
+instance ToJSON Persona
+instance FromJSON Persona
+\end{code}
+¡No es necesario escribir más código!
+\begin{itemize}
+\item Las instancias se derivan de la propia declaración de tipo
+\item Los nombre de campos se usan como claves
+\end{itemize}
+\end{frame}
+
+\section{Hora de un merecido descanso}
+
+\section{Sirviendo con Servant}
+
+%1
+\begin{frame}[fragile]
+%\frametitle{A}
+\begin{block}
+{\LARGE La API de tu aplicación web es su \emph{tipo}}
+\end{block}
+\pause
+\begin{itemize}
+\item Especifica el contrato y los formatos aceptados por cada ruta
+\item Independientemente de la conversión y el transporte
+\item Una misma API da lugar a diferentes implementaciones
+\begin{itemize}
+\item Servidor
+\item Cliente
+\item Documentación
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%2
+\begin{frame}[fragile]
+\frametitle{Ejemplo: un servicio de contadores}
+\begin{itemize}
+\item {\tt PUT /new}: genera un nuevo contador
+\begin{itemize}
+\item El cuerpo de la llamada indica el nombre del contador
+\item Devuelve un identificador numérico
+\end{itemize}
+\item {\tt POST /step/:id}: aumenta en uno el contador
+\item {\tt GET /value/:id}: obtiene el valor del contador
+\item {\tt GET /list}: lista los contadores
+\begin{itemize}
+\item Opcionalmente puede llevar un parámetro {\tt order} que indica si ordenar por orden creciente o decreciente de valor
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%3
+\begin{frame}[fragile]
+\frametitle{Nuestro tipo-API}
+\begin{code}
+type NewAPI     = "new"    :> ReqBody flu[PlainText] Text
+                           :> Put   flu[JSON] CounterId
+type StepAPI    = "step"   :> Capture "id" CounterId
+                           :> Post  flu[JSON] Integer
+type ValueAPI   = "value"  :> Capture "id" CounterId
+                           :> Get   flu[JSON] Integer
+type ListAPI    = "list"   :> QueryParam "order" Order
+                           :> Get   flu[JSON] [Counter]
+
+type AppAPI     = NewAPI :<|> StepAPI :<|> ValueAPI :<|> ListAPI
+\end{code}
+\end{frame}
+
+%4
+\begin{frame}[fragile]
+\frametitle{Locura en los tipos}
+Se usan muchísimos tipos promocionados
+\begin{itemize}
+\item Cadenas a nivel de tipo, cuyo kind es |Symbol|
+\item Listas a nivel de tipo, encabezadas por |flu|
+\begin{itemize}
+\item Por ejemplo, |flu[Int, String] :: flu[*]|
+\item Nótese la diferencia entre |[String]| y |flu[String]|
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%5
+\begin{frame}[fragile]
+\frametitle{Construyendo rutas}
+%Hay dos combinadores básicos al definir un tipo-API
+\begin{itemize}
+\item |:<||>| combina rutas para construir una aplicación
+\item |:>| combina segmentos para construir una ruta
+\end{itemize}
+Hay multitud de posibilidades para un segmento
+\begin{itemize}
+\item |"cadena"| indica un segmento que ha de aparecer literalmente
+\item Hay varias formas de capturar información
+\begin{itemize}
+\item |Capture "campo" Tipo| indica que lo que aparezca en ese segmento estará disponible luego bajo el nombre |campo|
+\item |ReqBody flu[Formatos] Tipo| indica que el cuerpo de la petición contendrá un valor serializado en uno de los formatos indicados
+\item |QueryParam "campo" Tipo| se usa para {\tt ?campo=valor}
+\end{itemize}
+\item |Verbo flu[Formatos] Tipo| indica una acción HTTP
+\begin{itemize}
+\item Por ejemplo |Get|, |Post|, |Put|, |Delete| o |Patch|
+\item Tal acción tendrá como resultado un valor del tipo mencionado
+\item Que puede ser servido en uno de los formatos indicados
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%6
+\begin{frame}[fragile]
+\frametitle{Preparando el percal}
+\begin{code}
+type CounterId = Integer
+data Counter = Counter { counterId    :: CounterId
+                       , counterName  :: Text
+                       , counterValue :: Integer }
+             deriving (Eq, Show, Generic)
+instance FromJSON Counter
+instance ToJSON Counter
+\end{code}
+\end{frame}
+
+%7
+\begin{frame}[fragile]
+\frametitle{Cómo mantener el estado de la aplicación}
+Para guardar el estado de la aplicación vamos a usar STM
+\begin{itemize}
+\item STM = \emph{Memoria Software Transaccional}
+\item |TVar| = variable con acceso arbitrado transaccionalmente
+\item Protección frente acceso concurrente
+\end{itemize}
+Su uso es {\bf muy} sencillo
+\begin{itemize}
+\item Creamos |TVar|s con |newTVar| o |newTVarIO|
+\item Escribimos {\it scripts} transaccionales dentro de la mónada |STM|
+\begin{itemize}
+\item Usando |readTVar|, |writeTVar| o |modifyTVar|
+\end{itemize}
+\item Ejecutamos un {\it script} usando |atomically|
+\end{itemize}
+\end{frame}
+
+%8
+\begin{frame}[fragile]
+\frametitle{Implementando un trocito de API}
+Para servir |API| tenemos que implementar un valor |Server API|
+\begin{itemize}
+\item |Server| es una familia de tipos que indica qué necesitamos definir para servir una ruta
+\item Todas las variables capturadas se convierten en argumentos
+\item Este servicio vive en el paquete {\tt servant-server}
+\end{itemize}
+\vspace{-0.3cm}
+\begin{verbatim}
+*Charla> :kind! Server NewAPI
+Server NewAPI :: *
+= Text -> EitherT ServantErr IO Integer
+\end{verbatim}
+\vspace{-0.3cm}
+\begin{itemize}
+\item En un servidor podemos ejecutar acciones |IO|
+\begin{itemize}
+\item Tenemos que usar |liftIO| para ello
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%9
+\begin{frame}[fragile]
+\frametitle{Haskell es el mejor lenguaje imperativo}
+\begin{code}
+type Estado = (TVar CounterId, TVar [Counter])
+
+servirNewAPI :: Estado -> Server NewAPI
+servirNewAPI (ultimoId, lista) nombre = liftIO $
+  atomically $ do  modifyTVar ultimoId (+1)
+                   nuevoId <- readTVar ultimoId
+                   let c = Counter nuevoId nombre 0
+                   modifyTVar lista (c :)
+                   return nuevoId
+\end{code}
+\end{frame}
+
+%10
+\begin{frame}[fragile]
+\frametitle{Ejecutando el servidor}
+Usando |serve| convertimos un |Server| en una |Application| de WAI
+\begin{itemize}
+\item WAI = Web Application Interface
+\item Protocolo común a todas las aplicaciones web Haskell
+\begin{itemize}
+\item Similar a servlets de Java o a WSGI para Python
+\end{itemize}
+\end{itemize}
+Para correr una |Application| necesitamos un {\it runner}
+\begin{itemize}
+\item Warp es el más común y funciona muy bien
+\end{itemize}
+\pause
+\begin{code}
+servidor :: Estado -> Application
+servidor s = serve (Proxy :: Proxy NewAPI) (servirNewAPI s)
+
+main :: IO ()
+main = do  estado <- (,) <$> newTVarIO 0 <*> newTVarIO []
+           run 8081 (servidor estado)
+\end{code}
+\end{frame}
+
+%11
+\begin{frame}[fragile]
+\frametitle{Implementando el listado de contadores}
+\begin{code}
+servirListAPI :: Estado -> Server ListAPI
+servirListAPI (_, lista) _ = liftIO $ readTVarIO $ lista
+
+servidor :: Estado -> Application
+servidor s = serve  (Proxy :: Proxy (NewAPI :<|> ListAPI))
+                    (servirNewAPI s :<|> servirListAPI s)
+\end{code}
+\pause
+{\Large No sé a vosotros, a mí esto me parece \emph{magia}}~~\EOstarWarrior
+\end{frame}
+
+%12
+\begin{frame}[fragile]
+\frametitle{Devolviendo HTML}
+Ahora queremos devolver HTML además de JSON
+\begin{enumerate}
+\item Añadir el nuevo formato a la lista de |Get|
+\begin{code}
+type ListAPI    = "list"   :> QueryParam "order" Order
+                           :> Get   flu[JSON, HTML] [Counter]
+\end{code}
+\item Implementar la conversión a |HTML| mediante |ToHtml|
+\begin{code}
+instance ToHtml [Counter] where
+  toHtml = ...
+\end{code}
+\end{enumerate}
+\end{frame}
+
+%13
+\begin{frame}[fragile]
+\frametitle{Generando HTML con Haskell}
+Hay 3 grandes posturas para generar HTML
+\begin{itemize}
+\item Un lenguaje de \emph{templates} ajeno a Haskell
+\begin{itemize}
+\item Por ejemplo, {\tt mustache}
+\end{itemize}
+\item Un lenguaje integrado en Haskell (un DSL)
+\begin{itemize}
+\item Por ejemplo, {\tt blaze-html} y {\tt lucid}
+\item Si preferimos usar Markdown, {\tt markdown}
+\end{itemize}
+\item Un término medio: un lenguaje ajeno a Haskell que en tiempo de \emph{compilación} se convierte en llamadas a una librería
+\begin{itemize}
+\item Usando \emph{quasi-quotating} para parsear
+\item {\tt shakespeare} es el mayor exponente
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%14
+\begin{frame}[fragile]
+\frametitle{Generando HTML con {\tt lucid}}
+\begin{itemize}
+\item Los elementos y atributos son funciones
+\begin{itemize}
+\item El nombre es el mismo que en HTML más |_|
+\end{itemize}
+\item El contenido de una etiqueta o el valor de un atributo se da como \emph{argumento} de la función
+\item Los atributos de una etiqueta como una lista
+\item Si dentro de un elemento hay varios elementos, se puede usar
+\begin{itemize}
+\item El combinador monoidal |<>|
+\item Notación monádica con |do|
+\end{itemize}
+\end{itemize}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{code}
+div_ [class_ "info"] $ do
+  p_ (strong_ "Lugar")
+  p_ "Haskell-MAD"
+\end{code}
+\column{0.5\textwidth}
+\begin{verbatim}
+<div class="info">
+  <p><strong>Lugar</strong></p>
+  <p>Haskell-MAD</p>
+</div>
+\end{verbatim}
+\end{columns}
+\end{frame}
+
+%15
+\begin{frame}[fragile]
+\frametitle{Ventajas de ser una mónada}
+\begin{code}
+{-# LANGUAGE FlexibleInstances #-}
+
+import Lucid
+
+instance ToHtml [Counter] where
+  toHtml cs =  ul_ $ forM_ cs $ \(Counter _ nm v) -> do
+                 li_ $ do  strong_  (toHtml nm)
+                           toHtml ":"
+                           toHtml (show v)
+\end{code}
+\end{frame}
+
+%16
+\begin{frame}[fragile]
+\frametitle{Generando HTML con {\tt shakespeare}}
+\begin{verbatim}
+{-# LANGUAGE QuasiQuotes #-}
+
+import Text.Blaze
+import Text.Hamlet
+
+instance ToMarkup [Counter] where
+  toMarkup cs = [shamlet|
+<ul>
+  $forall c <- cs
+    <li>
+      <strong>#{counterName c}
+      : #{counterValue c} |]
+\end{verbatim}
+\end{frame}
+
+\section{Bases de datos}
+
+%17
+\begin{frame}[fragile]
+\frametitle{Tres enfoques}
+\begin{columns}
+\column{0.4\textwidth}
+Una BBDD particular
+\begin{itemize}
+\item {\tt postgres-simple}
+\item {\tt mysql-simple}
+\item {\tt sqlite}
+\item {\tt mongoDB}
+\item {\tt hedis}
+\item {\tt rethinkdb}
+\end{itemize}
+\column{0.5\textwidth}
+Basadas en álgebra relacional
+\begin{itemize}
+\item HaskellDB
+\item HaSQL
+\end{itemize}
+
+\
+
+``ORM funcionales''
+\begin{itemize}
+\item {\bf Persistent}
+\item Groundhog
+\end{itemize}
+\end{columns}
+\end{frame}
+
+%18
+\begin{frame}[fragile]
+\frametitle{Primer paso: el esquema}
+\begin{scriptsize}
+\begin{code}
+{-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
+{-# LANGUAGE GADTs, TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+\end{code}
+\end{scriptsize}
+\vspace{-0.9cm}
+\begin{code}
+mkPersist sqlSettings [persistLowerCase|
+Usuario json
+  nombre     String
+  apellidos  String
+  NombreCompleto nombre apellidos
+  deriving Show
+Contador json
+  nombre   String
+  valor    Int
+  usuario  UsuarioId
+  deriving Show |]
+\end{code}
+\end{frame}
+
+%19
+\begin{frame}[fragile]
+\frametitle{¿Qué hay en un esquema?}
+Cada elemento del esquema es una \emph{entidad}, compuesta por:
+\begin{itemize}
+\item Una clave primaria siempre presente
+\begin{itemize}
+\item Cuyo tipo por defecto se denomina {\tt EntidadId}
+\end{itemize}
+\item Un conjunto de \emph{campos}: {\tt nombreCampo TipoCampo}
+\item Un conjunto de \emph{criterios de unicidad}: \\
+{\tt NombreCriterio campo1 campo2 ...}
+\end{itemize}
+\end{frame}
+
+%20
+\begin{frame}[fragile]
+\frametitle{Mirando debajo de la manta: {\tt -ddump-splices}}
+\begin{small}
+\begin{code}
+data Contador
+  = Contador {  contadorNombre   :: !String,
+                contadorValor    :: !Int,
+                contadorUsuario  :: !(Key Usuario) }
+  deriving (Show, FromJSON, ToJSON)
+
+type ContadorId = Key Contador
+
+instance PersistEntity Contador where
+  data Unique Contador
+  newtype Key Contador
+    = ContadorKey { unContadorKey :: BackendKey SqlBackend }
+  data EntityField Contador where
+    ContadorId       :: EntityField Contador (Key Contador)
+    ContadorNombre   :: EntityField Contador String
+    ContadorValor    :: EntityField Contador Int
+    ContadorUsuario  :: EntityField Contador (Key Usuario)
+\end{code}
+\end{small}
+\end{frame}
+
+%21
+\begin{frame}[fragile]
+\frametitle{Ejecutando una transacción}
+\begin{itemize}
+\item Las transacciones se definen en la mónada |SqlPersistT|
+\begin{itemize}
+\item Una transacción es independiente del {\it back-end}
+\end{itemize}
+\item La ejecución de una consulta depende de la BBDD
+\begin{itemize}
+\item Diferentes librerías como {\tt persistent-sqlite}
+\item Normalmente es posible usar un {\it pool} de conexiones
+\end{itemize}
+\end{itemize}
+\begin{code}
+servirListAPI :: ConnectionPool -> Server ListAPI
+servirListAPI pool _ = liftIO $
+  flip runSqlPersistMPool pool $ do
+    -- Aquí va la transacción SQL
+
+main :: IO ()
+main = runNoLoggingT $
+  withSqlitePool "contadores.db" 10 $ \pool ->
+    NoLoggingT $ run 8081 (servidor pool)
+\end{code}
+\end{frame}
+
+%22
+\begin{frame}[fragile]
+\frametitle{Inserción}
+
+\end{frame}
+
+%23
+\begin{frame}[fragile]
+\frametitle{Consulta por identificador}
+
+\end{frame}
+
+%24
+\begin{frame}[fragile]
+\frametitle{Consulta por datos}
+
+\end{frame}
+
+\section{Vamos a ir acabando\dots}
+
+\begin{frame}[fragile]
+\frametitle{Conclusión}
 
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{A}
+\frametitle{Para saber más}
 
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{A}
-
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{A}
-
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{A}
-
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{A}
-
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{A}
-
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{A}
-
-\end{frame}
+\section{¡Mil gracias!}
 
 \end{document}

@@ -2,7 +2,11 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE DataKinds, KindSignatures #-}
 {-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module Charla where
+
+import Data.Aeson
+import GHC.Generics
 
 data Numero where
   Cero  ::            Numero
@@ -29,11 +33,11 @@ primero :: Lista (Suc n) e -> e
 -- primero Fin = ??
 primero (e :/: _) = e
 
-type family n :+: m where
-  Cero  :+: m = m
-  Suc n :+: m = Suc (n :+: m)
+type family Mas n m where
+  Cero  `Mas` m = m
+  Suc n `Mas` m = Suc (n `Mas` m)
 
-unir :: Lista n e -> Lista m e -> Lista (n :+: m) e
+unir :: Lista n e -> Lista m e -> Lista (n `Mas` m) e
 unir Fin        lst = lst
 unir (e :/: r)  lst = e :/: unir r lst
 
@@ -46,3 +50,11 @@ instance Coleccion [e] where
   type Elemento [e] = e
   vacio = []
   (//)  = (:)
+
+data Persona = Persona { nombre :: String
+                       , apellidos :: String
+                       , edad :: Integer }
+             deriving (Eq, Show, Generic, ToJSON, FromJSON)
+
+-- instance ToJSON Persona
+-- instance FromJSON Persona
