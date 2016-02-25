@@ -22,6 +22,7 @@
 %format <$> = "~\langle \! \$ \! \rangle~"
 %format <*> = "~\langle \! * \! \rangle~"
 %format flu = "` \!"
+%format >. = "> \!\! .~"
 
 \begin{document}
 \maketitle
@@ -973,31 +974,110 @@ main = runNoLoggingT $
 %22
 \begin{frame}[fragile]
 \frametitle{Inserción}
+\begin{code}
+type NewUserAPI  =  "user" :> "new"
+                    :> Capture "nombre" String
+                    :> Capture "apellidos" String
+                    :> Put flu[JSON] UsuarioId
 
+servirNewUsuario  :: ConnectionPool -> Server NewUserAPI
+servirNewUsuario pool nombre apellidos = do
+  u <-  liftIO $ flip runPersistMPool pool $
+          insertUnique (Usuario nombre apellidos)
+  case u of
+    Nothing  -> left err409 { errBody = "U. duplicado" }
+    Just k   -> return k
+\end{code}
+\vspace{-0.7cm}
+\begin{itemize}
+\item |insertUnique| comprueba las restricciones de unicidad
+\item |insert| las obvia, pero la BBDD puede lanzar una excepción
+\end{itemize}
 \end{frame}
 
 %23
 \begin{frame}[fragile]
 \frametitle{Consulta por identificador}
-
+\begin{code}
+servirValueAPI pool cid = do
+  c <-  liftIO $ flip runPersistMPool pool $ get cid
+  case c of
+    Nothing  -> left err404
+    Just cn  -> return (contadorValor cn)
+\end{code}
+\begin{itemize}
+\item Nótese que el tipo de la clave es |ContadorId|
+\begin{itemize}
+\item Si tuviésemos sólo un |Int| tendríamos que envolverlo en |ContadorKey $ SqlBackendKey cid|
+\end{itemize}
+\end{itemize}
 \end{frame}
 
 %24
 \begin{frame}[fragile]
-\frametitle{Consulta por datos}
+\frametitle{Consulta por campos}
+\begin{code}
+type MayorQueAPI  =  "more" :> Capture "value" Int
+                     :> Get flu[JSON] [Contador]
 
+servirMayorQue :: ConnectionPool -> Server MayorQueAPI
+servirMayorQue pool value =
+  liftIO $ flip runPersistMPool pool $
+    selectList  [ContadorValor >. value]
+                [Desc ContadorValue]
+\end{code}
+|selectList| toma dos argumentos
+\begin{enumerate}
+\item Lista de criterios usando los identificadores de campo
+\begin{itemize}
+\item El {\tt AND} se describe como una lista
+\item El {\tt OR} tiene su propio combinador |(.||||)|
+\end{itemize}
+\item Opciones de la consulta, como el orden
+\end{enumerate}
 \end{frame}
 
 \section{Vamos a ir acabando\dots}
 
 \begin{frame}[fragile]
-\frametitle{Conclusión}
-
+\frametitle{Para saber más}
+\begin{itemize}
+\item Mi charla en LambdaConf \emph{Developing Web Apps in Haskell}
+\begin{itemize}
+\item Más información y ejercicios sobre bases de datos
+\end{itemize}
+\item El tutorial de Servant {\tt haskell-servant.github.io}
+\begin{itemize}
+\item Incluye cómo generar cliente y doc. a partir del tipo-API
+\end{itemize}
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Para saber más}
+\frametitle{Conclusión}
+El sistema de tipos nos permite describir conceptos a \emph{alto nivel}
+\begin{itemize}
+\item APIs de una aplicación web
+\item Entidades, campos y relaciones de una BBDD
+\end{itemize}
+Hay dos \emph{ventajas} fundamentales
+\begin{itemize}
+\item Seguridad de tipos
+\item {\bf Reducción del código \emph{boilerplate}}
+\end{itemize}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Mónadas para todos los gustos}
+\begin{itemize}
+\item |Server == EitherT ServantErr IO| para web
+\begin{itemize}
+\item Tiene |IO| como base, a la que accedemos con |liftIO|
+\end{itemize}
+\item |Html| para construir documentos web
+\item |STM| para gestionar datos transaccionalmente
+\item |SqlPersistM| para acceso a bases de datos
+\end{itemize}
 \end{frame}
 
 \section{¡Mil gracias!}
